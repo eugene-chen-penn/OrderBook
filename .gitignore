@@ -1,0 +1,9 @@
+/build/
+/output/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+/lob
+.DS_Store
+.env
