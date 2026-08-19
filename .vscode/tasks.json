@@ -42,6 +42,30 @@
       "dependsOn": "CMake: build debug",
       "dependsOrder": "sequence",
       "problemMatcher": []
+    },
+    {
+      "label": "Run MdHub test",
+      "type": "shell",
+      "command": "${workspaceFolder}/build/debug/mdhub_test",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": "CMake: build debug",
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Run LinearBoard test",
+      "type": "shell",
+      "command": "${workspaceFolder}/build/debug/linear_board_test",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "dependsOn": "CMake: build debug",
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "group": "test"
     }
   ]
 }

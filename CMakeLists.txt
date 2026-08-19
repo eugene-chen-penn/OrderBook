@@ -20,19 +20,18 @@ function(orderbook_set_defaults target)
 endfunction()
 
 add_library(orderbook_core
-    Order.cpp
-    OrderBook.cpp
-    PriceLevel.cpp
-    MatchingEngine.cpp
-    Trades.cpp
-    TradingSession.cpp
-    Strategy.cpp
+    LOB/Order.cpp
+    LOB/OrderBook.cpp
+    LOB/PriceLevel.cpp
+    LOB/MatchingEngine.cpp
+    LOB/Trades.cpp
+    LOB/Strategy.cpp
 )
-target_include_directories(orderbook_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(orderbook_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/LOB)
 orderbook_set_defaults(orderbook_core)
 
-add_library(clickhouse_access ClickHouseClient.cpp)
-target_include_directories(clickhouse_access PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(clickhouse_access LOB/ClickHouseClient.cpp)
+target_include_directories(clickhouse_access PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/LOB)
 target_link_libraries(clickhouse_access
     PUBLIC orderbook_core
     PRIVATE CURL::libcurl
@@ -41,14 +40,30 @@ orderbook_set_defaults(clickhouse_access)
 
 add_executable(orderbook
     main.cpp
-    PriceGui.cpp
+    LOB/PriceGui.cpp
 )
 target_link_libraries(orderbook PRIVATE clickhouse_access)
 orderbook_set_defaults(orderbook)
 
-add_executable(backtest_commissions BacktestCommissionsMain.cpp)
+add_executable(backtest_commissions LOB/BacktestCommissionsMain.cpp)
 target_link_libraries(backtest_commissions PRIVATE clickhouse_access)
 orderbook_set_defaults(backtest_commissions)
+
+add_library(mdhub
+    MdHub/LinearBoard.cpp
+    MdHub/SpscRingQueue.cpp
+)
+target_include_directories(mdhub PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/MdHub)
+orderbook_set_defaults(mdhub)
+
+add_executable(mdhub_test MdHub/test.cpp)
+target_link_libraries(mdhub_test PRIVATE mdhub)
+orderbook_set_defaults(mdhub_test)
+
+add_executable(linear_board_test MdHub/test.cpp)
+target_compile_definitions(linear_board_test PRIVATE MDHUB_TEST_LINEAR_BOARD=1)
+target_link_libraries(linear_board_test PRIVATE mdhub)
+orderbook_set_defaults(linear_board_test)
 
 include(CTest)
 if(BUILD_TESTING)
@@ -61,4 +76,7 @@ if(BUILD_TESTING)
     target_link_libraries(clickhouse_access_tests PRIVATE clickhouse_access)
     orderbook_set_defaults(clickhouse_access_tests)
     add_test(NAME clickhouse_access_tests COMMAND clickhouse_access_tests)
+
+    add_test(NAME mdhub_test COMMAND mdhub_test)
+    add_test(NAME linear_board_test COMMAND linear_board_test)
 endif()
