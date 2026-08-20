@@ -54,6 +54,9 @@ add_library(mdhub
     MdHub/SpscRingQueue.cpp
 )
 target_include_directories(mdhub PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/MdHub)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_libraries(mdhub PUBLIC rt)
+endif()
 orderbook_set_defaults(mdhub)
 
 add_executable(mdhub_test MdHub/test.cpp)
